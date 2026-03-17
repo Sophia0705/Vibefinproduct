@@ -1,0 +1,84 @@
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# dependencies
+/node_modules
+/.pnp
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/versions
+
+# testing
+/coverage
+
+# next.js
+/.next/
+/out/
+
+# production
+/build
+
+# misc
+.DS_Store
+*.pem
+
+# debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# env files (can opt-in for committing if needed)
+.env*
+.env
+
+# vercel
+.vercel
+
+# typescript
+*.tsbuildinfo
+next-env.d.ts
+
+# --- Common (공통) ---
+node_modules/
+.DS_Store
+.env*
+.env
+*.pem
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+.vscode/
+
+# --- Frontend (Next.js) ---
+frontend/.next/
+frontend/out/
+frontend/build/
+frontend/next-env.d.ts
+frontend/*.tsbuildinfo
+
+# --- Backend (NestJS) ---
+backend/dist/
+backend/node_modules/
+backend/*.tsbuildinfo
+# NestJS 빌드 결과물 제외
+backend/thumbnails/ 
+# 만약 파일 업로드 기능을 구현하신다면 해당 폴더도 추가
+
+# --- Database (MySQL / Prisma / Docker) ---
+# Docker를 사용하신다면 DB 데이터 폴더 제외 (보통 /db_data 등으로 설정)
+mysql_data/
+# TypeORM 빌드 결과 및 캐시
+backend/*.tsbuildinfo
+backend/ormconfig.js.map
+
+# --- Package Managers (.yarn, .pnp 등) ---
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/versions
