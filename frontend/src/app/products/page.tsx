@@ -34,9 +34,35 @@ function logoSrc(finCoNo: string) {
   return BANK_LOGO_SRC_BY_FIN_CO_NO[finCoNo] ?? null;
 }
 
+function productTypeLabel(t: "DEPOSIT" | "SAVING") {
+  return t === "DEPOSIT" ? "예금" : "적금";
+}
+
 function formatRate(v: string | null) {
   if (!v) return "-";
   return `${v}%`;
+}
+
+function formatWon(amount: string | null) {
+  if (!amount) return "-";
+  const n = Number(amount);
+  if (!Number.isFinite(n)) return "-";
+  return new Intl.NumberFormat("ko-KR", { maximumFractionDigits: 0 }).format(n);
+}
+
+function formatMultiline(text: string | null) {
+  if (!text) return "-";
+  // 1) Normalize line endings
+  let s = text.replace(/\r\n/g, "\n").replace(/\r/g, "\n").trim();
+
+  // 2) If numbered items are glued in one line, break before "N."
+  //    e.g. "... 1. ... 2. ... 3. ..." -> line breaks
+  s = s.replace(/(\s)(\d+\.)\s+/g, "\n$2 ");
+
+  // 3) Collapse excessive blank lines
+  s = s.replace(/\n{3,}/g, "\n\n");
+
+  return s;
 }
 
 function pickBestRate(options: SavingProductOption[]) {
@@ -123,7 +149,7 @@ export default async function ProductsPage({
             상품 목록
           </h1>
           <p className="mt-1 text-sm text-slate-600">
-            금융감독원 Open API 기반 데이터 (DEPOSIT=예금, SAVING=적금)
+            금융감독원 Open API 기반 데이터
           </p>
 
           <ProductsFiltersClient
@@ -151,12 +177,12 @@ export default async function ProductsPage({
                   <div>
                     <div className="flex flex-wrap items-center gap-2">
                       <BankLogo bankName={p.korCoNm} src={logoSrc(p.finCoNo)} />
-                      <span className="text-sm font-medium text-slate-600">{p.korCoNm}</span>
-                      <span className="inline-flex items-center rounded-full bg-sky-50 px-3 py-1 text-xs font-semibold text-sky-700">
-                        {p.productType}
+                      <span className="text-md font-medium text-slate-600">{p.korCoNm}</span>
+                      <span className="inline-flex items-center rounded-full bg-sky-50 px-3 py-1 text-sm font-semibold text-sky-700">
+                        {productTypeLabel(p.productType)}
                       </span>
                       {p.dclsMonth ? (
-                        <span className="text-xs text-slate-400">공시 {p.dclsMonth}</span>
+                        <span className="text-sm text-slate-400">공시 {p.dclsMonth}</span>
                       ) : null}
                     </div>
                     <h2 className="mt-2 text-lg font-semibold tracking-tight text-slate-900">
@@ -164,25 +190,29 @@ export default async function ProductsPage({
                     </h2>
                     <div className="mt-2 flex flex-wrap gap-x-6 gap-y-1 text-sm text-slate-600">
                       <span>
-                        우대조건:{" "}
-                        <span className="text-slate-800">{p.spclCnd ?? "-"}</span>
+                        <span className="font-semibold text-slate-700">우대조건:</span>{" "}
+                        <span className="whitespace-pre-line text-slate-800">
+                          {formatMultiline(p.spclCnd)}
+                        </span>
                       </span>
                       <span>
-                        가입방법:{" "}
+                        <span className="font-semibold text-slate-700">가입방법:</span>{" "}
                         <span className="text-slate-800">{p.joinWay ?? "-"}</span>
                       </span>
                       <span>
-                        최고한도:{" "}
+                        <span className="font-semibold text-slate-700">최고한도:</span>{" "}
                         <span className="text-slate-800">
-                          {p.maxLimit ? `${p.maxLimit}원` : "-"}
+                          {p.maxLimit ? `${formatWon(p.maxLimit)}원` : "-"}
                         </span>
                       </span>
                     </div>
                   </div>
 
                   <div className="rounded-2xl bg-linear-to-b from-sky-50 to-white px-5 py-4 ring-1 ring-sky-100">
-                    <div className="text-xs font-medium text-slate-500">최고 우대금리</div>
-                    <div className="mt-1 text-2xl font-semibold tracking-tight text-sky-700">
+                    <div className="whitespace-nowrap text-xs font-semibold text-slate-600">
+                      최고 우대금리
+                    </div>
+                    <div className="mt-1 text-3xl font-semibold tracking-tight text-sky-700">
                       {best === null ? "-" : `${best.toFixed(2)}%`}
                     </div>
                   </div>
